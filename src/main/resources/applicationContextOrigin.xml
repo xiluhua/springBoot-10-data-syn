@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
+
+	<context:component-scan base-package="com.multi" />
+	
+	<!-- <alias name="person" alias="psn"/> -->
+	<!-- 数据源配置1 -->
+	<bean id="dataSource1" class="com.alibaba.druid.pool.DruidDataSource"
+		init-method="init" destroy-method="close">
+		<property name="driverClassName" value="${db.driver}" />
+		<property name="url" value="${db1.jdbc.url}" />
+		<property name="username" value="${db.login.name}"></property>
+		<property name="password" value="${db.login.password}" />
+		<property name="filters" value="${db.filters}"></property>
+		<property name="maxActive" value="${db.pool.maxActive}"></property>
+		<property name="initialSize" value="${db.pool.initialSize}"></property>
+		<property name="minIdle" value="${db.pool.minIdle}"></property>
+		<property name="maxWait" value="${db.maxWait}"></property>
+		<property name="timeBetweenEvictionRunsMillis" value="${db.timeBetweenEvictionRunsMillis}"></property>
+		<property name="minEvictableIdleTimeMillis" value="${db.minEvictableIdleTimeMillis}"></property>
+		<property name="validationQuery" value="${db.validationQuery}"></property>
+		<property name="testWhileIdle" value="${db.testWhileIdle}"></property>
+		<property name="testOnBorrow" value="${db.testOnBorrow}"></property>
+		<property name="testOnReturn" value="${db.testOnReturn}"></property>
+		<property name="poolPreparedStatements" value="${db.poolPreparedStatements}"></property>
+		<property name="maxOpenPreparedStatements" value="${db.maxOpenPreparedStatements}"></property>
+		<!-- 监控数据库 -->
+		<property name="proxyFilters">
+			<list>
+				<ref bean="log-filter" />
+			</list>
+		</property>
+	</bean>
+
+	<!-- 数据源配置2 -->
+	<bean id="dataSource2" class="com.alibaba.druid.pool.DruidDataSource"
+		init-method="init" destroy-method="close">
+		<property name="driverClassName" value="${db.driver}" />
+		<property name="url" value="${db2.jdbc.url}" />
+		<property name="username" value="${db.login.name}"></property>
+		<property name="password" value="${db.login.password}" />
+		<property name="filters" value="${db.filters}"></property>
+		<property name="maxActive" value="${db.pool.maxActive}"></property>
+		<property name="initialSize" value="${db.pool.initialSize}"></property>
+		<property name="minIdle" value="${db.pool.minIdle}"></property>
+		<property name="maxWait" value="${db.maxWait}"></property>
+		<property name="timeBetweenEvictionRunsMillis" value="${db.timeBetweenEvictionRunsMillis}"></property>
+		<property name="minEvictableIdleTimeMillis" value="${db.minEvictableIdleTimeMillis}"></property>
+		<property name="validationQuery" value="${db.validationQuery}"></property>
+		<property name="testWhileIdle" value="${db.testWhileIdle}"></property>
+		<property name="testOnBorrow" value="${db.testOnBorrow}"></property>
+		<property name="testOnReturn" value="${db.testOnReturn}"></property>
+		<property name="poolPreparedStatements" value="${db.poolPreparedStatements}"></property>
+		<property name="maxOpenPreparedStatements" value="${db.maxOpenPreparedStatements}"></property>
+		<!-- 监控数据库 -->
+		<property name="proxyFilters">
+			<list>
+				<ref bean="log-filter" />
+			</list>
+		</property>
+	</bean>
+
+	<!-- 编写spring 配置文件的配置多数源映射关系 -->
+	<bean class="com.multi.dataSource.DynamicDataSource" id="dataSource">
+		<property name="targetDataSources">
+			<map key-type="java.lang.String">
+				<entry value-ref="dataSource1" key="dataSource1"></entry>
+				<entry value-ref="dataSource2" key="dataSource2"></entry>
+			</map>
+		</property>
+		<property name="defaultTargetDataSource" ref="dataSource1">
+		</property>
+	</bean>
+
+	<!-- 输出可执行的SQL -->
+	<bean id="log-filter" class="com.alibaba.druid.filter.logging.Log4jFilter">
+		<property name="statementExecutableSqlLogEnable" value="true" />
+	</bean>
+
+	<!-- 配置 EntityManagerFactory -->
+	<bean id="entityManagerFactory"
+		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+		<property name="dataSource" ref="dataSource"></property>
+		<!-- 配置 JPA 提供商的适配器. 可以通过内部 bean 的方式来配置 -->
+		<property name="jpaVendorAdapter">
+			<bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"></bean>
+		</property>	
+		<!-- 配置实体类所在的包 -->
+		<property name="packagesToScan" value="com.multi"></property>
+		
+		<!-- 配置 JPA 的基本属性. 例如 JPA 实现产品的属性 -->
+		<property name="jpaProperties">
+			<props>
+				<prop key="hibernate.show_sql">false</prop>
+				<prop key="hibernate.format_sql">false</prop>
+				<prop key="hibernate.hbm2ddl.auto">none</prop>
+			</props>
+		</property>
+	</bean>
+	
+	<!-- 配置 JPA 使用的事务管理器 -->
+	<bean id="transactionManager"
+		class="org.springframework.orm.jpa.JpaTransactionManager">
+		<property name="entityManagerFactory" ref="entityManagerFactory"></property>	
+	</bean>
+	
+
+	<!-- 这里用到了 -->
+	<tx:annotation-driven transaction-manager="transactionManager" /> 
+
+    <!--
+         beanName : org.springframework.aop.config.internalAutoProxyCreator
+         className: AspectJAwareAdvisorAutoProxyCreator
+    <bean id="multiDataSourceAdvice" 	class="com.multi.dataSource.advice.MultiDataSourceAdvice" />
+    <bean id="logBeforeAdvice" 			class="com.multi.log.advice.LogBeforeAdvice" />
+    <bean id="logAfterReturningAdvice" 	class="com.multi.log.advice.LogAfterReturningAdvice" />
+     -->
+	
+    <!-- 数据源 advice -->
+    <aop:config>
+		<!--POINTCUT SPACE-->
+		<!--ADVISER SPACE-->
+    </aop:config>
+
+	<!-- 使用 CGLIB 代理 -->
+	<aop:aspectj-autoproxy proxy-target-class="true" />
+	<aop:config proxy-target-class="true" />
+</beans>
