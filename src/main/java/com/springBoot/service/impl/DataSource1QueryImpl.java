@@ -19,4 +19,14 @@ public class DataSource1QueryImpl implements DataSource1QueryService{
 		SynDao synDao = SpringTool.getBean(clazz.getSimpleName()+"SynDao");
 		return synDao.getAll(clazz);
 	}
+	
+	@SuppressWarnings("rawtypes")
+	@MultiDataSource(name=MultiDataSource.dataSource1)
+	@Override
+	public Map<String, Object> getAllId(Class clazz) {
+		SynDao synDao = SpringTool.getBean(clazz.getSimpleName()+"SynDao");
+		return synDao.getAllId(clazz);
+	}
+	
+	
 }

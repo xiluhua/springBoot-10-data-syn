@@ -14,7 +14,8 @@ import com.springBoot.tool.SpringTool;
 @Service
 @Transactional
 public class DataSource2SynImpl implements DataSource2SynService {
-
+         
+	
 	@SuppressWarnings("rawtypes")
 	@MultiDataSource(name=MultiDataSource.dataSource2)
 	public void save(Map<String, Object> map) {

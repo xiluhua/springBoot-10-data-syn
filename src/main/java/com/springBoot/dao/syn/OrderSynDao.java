@@ -42,6 +42,14 @@ public class OrderSynDao implements SynDao{
 		}
 	}
 
+	@SuppressWarnings("rawtypes")
+	@Override
+	public Map<String, Object> getAllId(Class clazz) {
+		List<Integer> list = orderRepDao.getAllId();
+		Map<String, Object> map = SynTool.put(clazz, JSON.toJSONStringWithDateFormat(list, DateTool.DATE_TIME_MASK));
+		return map;
+	}
+
 	
 	
 	
