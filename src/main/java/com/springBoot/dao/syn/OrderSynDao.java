@@ -42,7 +42,45 @@ public class OrderSynDao implements SynDao{
 		}
 	}
 
+	@SuppressWarnings("rawtypes")
+	@Override
+	public Map<String, Object> getAllId(Class clazz) {
+		List<Integer> list = orderRepDao.getAllId();
+		Map<String, Object> map = SynTool.put(clazz, JSON.toJSONStringWithDateFormat(list, DateTool.DATE_TIME_MASK));
+		return map;
+	}
+
+	@Override
+	public boolean isExist(Integer id) {
+		return orderRepDao.existsById(id);
+	}
 	
+	@Override
+	public String findById(Integer id) {
+		Order obj = orderRepDao.findById(id).get();
+		String json  = JSON.toJSONStringWithDateFormat(obj, DateTool.DATE_TIME_MASK);
+		return json;
+	}
 	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@Override
+	public Map<String, Object> saveAll(Map<String, Object> map){
+		List<Order> objs = new ArrayList<>();
+		
+		Class clazz = (Class)map.get("class");
+		List<String> list = (List<String>)map.get("list");
+		for (String json : list) {
+			Order obj = JSON.parseObject(json, new TypeReference<Order>() {});
+			objs.add(obj);
+		}
+		Iterable<Order> it = orderRepDao.saveAll(objs);
+		
+		objs.clear();
+		for (Order obj : it) {
+			objs.add(obj);
+		}
+		map = SynTool.put(clazz, JSON.toJSONStringWithDateFormat(objs, DateTool.DATE_TIME_MASK));
+		return map;
+	}
 	
 }

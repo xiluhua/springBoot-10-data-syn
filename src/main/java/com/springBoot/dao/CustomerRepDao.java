@@ -59,5 +59,16 @@ public interface CustomerRepDao extends PagingAndSortingRepository<Customer, Int
 	@Modifying
 	@Query(value="UPDATE Customer c set c.email = :email where c.id = :id")
 	public int update13(@Param("email") String email, @Param("id") int id);
+	
+	
+	
+	/**
+	 * 本例
+	 * @author xiluhua
+	 * @since 20190303
+	 * @return
+	 */
+	@Query(value="SELECT c.id FROM Customer c order by c.id")
+	public List<Integer> getAllId(); 
 
 }

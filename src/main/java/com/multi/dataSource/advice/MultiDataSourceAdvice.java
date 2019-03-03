@@ -26,7 +26,7 @@ public class MultiDataSourceAdvice implements MethodBeforeAdvice,AfterReturningA
 		if (method.isAnnotationPresent(MultiDataSource.class)) 
 		{
 			MultiDataSource datasource = method.getAnnotation(MultiDataSource.class);
-			System.out.println("MultiDataSource: "+datasource.name());
+			System.out.println(method.getDeclaringClass().getName()+"."+method.getName()+"(*,*) --- MultiDataSource: "+datasource.name());
 			DataSourceContextHolder.setDataSourceType(datasource.name());
 			return;
 		}

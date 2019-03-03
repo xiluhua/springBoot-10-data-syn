@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.multi.entity.Customer;
+import com.multi.entity.Order;
 import com.springBoot.dao.CustomerRepDao;
 import com.springBoot.tool.DateTool;
 
@@ -42,37 +43,44 @@ public class CustomerSynDao implements SynDao{
 		}
 	}
 	
+	@SuppressWarnings("rawtypes")
+	@Override
+	public Map<String, Object> getAllId(Class clazz) {
+		List<Integer> list = customerRepDao.getAllId();
+		Map<String, Object> map = SynTool.put(clazz, JSON.toJSONStringWithDateFormat(list, DateTool.DATE_TIME_MASK));
+		return map;
+	}
 	
+	@Override
+	public boolean isExist(Integer id) {
+		return customerRepDao.existsById(id);
+	}
+
+	@Override
+	public String findById(Integer id) {
+		Customer obj = customerRepDao.findById(id).get();
+		String json  = JSON.toJSONStringWithDateFormat(obj, DateTool.DATE_TIME_MASK);
+		return json;
+	}
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	public static void main(String[] args) {
-		List<Customer> list = new ArrayList<>();
-		Customer c1 = new Customer();
-		c1.setAddr_id(111);
-		c1.setAge(1);
-		c1.setEmail("fsfsf");
-		Customer c2 = new Customer();
-		c2.setAddr_id(222);
-		c2.setAge(2);
-		c2.setEmail("ldsjfls");
-		list.add(c2);
-		list.add(c1);
-		String json = JSON.toJSONStringWithDateFormat(list, DateTool.DATE_TIME_MASK);
-		System.out.println("json: "+json);
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@Override
+	public Map<String, Object> saveAll(Map<String, Object> map){
+		List<Customer> objs = new ArrayList<>();
 		
-		List<Customer> list2 =  JSON.parseObject(json, new TypeReference<ArrayList<Customer>>() {});
-		for (Customer customer : list2) {
-			System.out.println(JSON.toJSONStringWithDateFormat(customer, DateTool.DATE_TIME_MASK));
+		Class clazz = (Class)map.get("class");
+		List<String> list = (List<String>)map.get("list");
+		for (String json : list) {
+			Customer obj = JSON.parseObject(json, new TypeReference<Customer>() {});
+			objs.add(obj);
 		}
+		Iterable<Customer> it = customerRepDao.saveAll(objs);
+		
+		objs.clear();
+		for (Customer obj : it) {
+			objs.add(obj);
+		}
+		map = SynTool.put(clazz, JSON.toJSONStringWithDateFormat(objs, DateTool.DATE_TIME_MASK));
+		return map;
 	}
 }
