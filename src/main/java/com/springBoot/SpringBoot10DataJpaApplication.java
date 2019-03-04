@@ -2,10 +2,8 @@ package com.springBoot;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -54,11 +52,11 @@ public class SpringBoot10DataJpaApplication {
 		}
 		
 		ConfigurableApplicationContext ctx 	= SpringApplication.run(SpringBoot10DataJpaApplication.class, args);
-		Set<Class> set = new HashSet<>();
-		set.add(Customer.class);
-		set.add(Order.class);
+		List<Class> classes = new ArrayList<>();
+		classes.add(Customer.class);
+		classes.add(Order.class);
 		
-		for (Class class1 : set) {
+		for (Class class1 : classes) {
 			DataSource1QueryImpl queryImpl	= ctx.getBean(DataSource1QueryImpl.class);
 			Map<String, Object> map 		= queryImpl.getAllId(class1);
 			
